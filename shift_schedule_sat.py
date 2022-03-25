@@ -202,29 +202,21 @@ def solve_shift_scheduling(params, output_proto):
         (1, 1, 0),
         (2, 2, 0),
         (3, 3, 0),
-        # (4, 2, 0),
-        # (5, 2, 0),
-        # (6, 2, 3),
-        # (7, 3, 0),
         (0, 0, 1),
         (1, 1, 1),
         (2, 2, 1),
         (3, 3, 1),
-        # (4, 2, 1),
-        # (5, 0, 1),
-        # (6, 0, 1),
-        # (7, 3, 1),
     ]
 
     # Request: (employee, shift, day, weight)
     # A negative weight indicates that the employee desire this assignment.
     requests = [
         # Employee 3 does not want to work on the first Saturday (negative weight for the Off shift).
-        (3, 0, 5, -2),
+        # (3, 0, 5, -2),
         # Employee 5 wants a night shift on the second Thursday (negative weight).
         # (5, 3, 10, -2),
         # Employee 2 does not want a night shift on the first Friday (positive weight).
-        (2, 3, 4, 4)
+        # (2, 3, 4, 4)
     ]
 
     # Shift constraints on continuous sequence :
@@ -233,12 +225,12 @@ def solve_shift_scheduling(params, output_proto):
     shift_constraints = [
         # One or two consecutive days of rest, this is a hard constraint.
         (0, 1, 1, 0, 2, 2, 0),
-        # betweem 2 and 3 consecutive days of night shifts, 1 and 4 are
+        # between 2 and 3 consecutive days of night shifts, 1 and 4 are
         # possible but penalized.
-        (3, 2, 2, 20, 4, 4, 5),
+        (3, 4, 4, 0, 4, 5, 0),
 
-        (1, 3, 3, 0, 4, 4, 0),
-        (2, 3, 3, 0, 4, 4, 0),
+        (1, 5, 5, 0, 6, 6, 0),
+        (2, 5, 5, 0, 6, 6, 0),
     ]
 
     # Weekly sum constraints on shifts days:
@@ -248,7 +240,7 @@ def solve_shift_scheduling(params, output_proto):
         # Constraints on rests per week.
         (0, 1, 2, 7, 2, 3, 4),
         # At least 1 night shift per week (penalized). At most 4 (hard).
-        (3, 0, 1, 3, 4, 4, 0),
+        # (3, 0, 1, 3, 4, 4, 0),
     ]
 
     # Penalized transitions:
@@ -262,15 +254,6 @@ def solve_shift_scheduling(params, output_proto):
 
     # daily demands for work shifts (morning, afternon, night) for each day
     # of the week starting on Monday.
-    # weekly_cover_demands = [
-    #     (2, 3, 1),  # Monday
-    #     (2, 3, 1),  # Tuesday
-    #     (2, 2, 2),  # Wednesday
-    #     (2, 3, 1),  # Thursday
-    #     (2, 2, 2),  # Friday
-    #     (1, 2, 3),  # Saturday
-    #     (1, 3, 1),  # Sunday
-    # ]
     weekly_cover_demands = [
         (1, 1, 1),  # Monday
         (1, 1, 1),  # Tuesday
