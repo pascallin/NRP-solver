@@ -20,6 +20,8 @@ from absl import flags
 from ortools.sat.python import cp_model
 from google.protobuf import text_format
 import matplotlib.pyplot as plt
+plt.rcParams["font.sans-serif"] = ["SimHei"]  # 设置字体
+plt.rcParams["axes.unicode_minus"] = False  # 该语句解决图像中的“-”负号的乱码问题
 
 FLAGS = flags.FLAGS
 
@@ -190,7 +192,7 @@ def solve_shift_scheduling(params, output_proto):
     """Solves the shift scheduling problem."""
     # Data
     num_employees = 4
-    employees_names = ['A', 'B', 'C', 'D']
+    employees_names = ['黎莉娟\n候桂聪', '黄媛媛\n廖琪琪', '殷妙妙\n陈燕娜', '兼职组']
     num_weeks = 5
     shifts = ['O', 'M', 'A', 'N']
     shifts_colors = ['white', 'tab:green', 'tab:orange', 'tab:blue']
@@ -198,14 +200,31 @@ def solve_shift_scheduling(params, output_proto):
     # Fixed assignment: (employee, shift, day).
     # This fixes the first 2 days of the schedule.
     fixed_assignments = [
+        # day 1
         (0, 0, 0),
         (1, 1, 0),
-        (2, 2, 0),
-        (3, 3, 0),
+        (2, 3, 0),
+        (3, 2, 0),
+        # day 2
         (0, 0, 1),
         (1, 1, 1),
-        (2, 2, 1),
-        (3, 3, 1),
+        (2, 3, 1),
+        (3, 2, 1),
+        # day 3
+        (0, 2, 2),
+        (1, 1, 2),
+        (2, 0, 2),
+        (3, 3, 2),
+        # day 4
+        (0, 2, 3),
+        (1, 0, 3),
+        (2, 1, 3),
+        (3, 3, 3),
+        # day 5
+        (0, 2, 4),
+        (1, 0, 4),
+        (2, 1, 4),
+        (3, 3, 4),
     ]
 
     # Request: (employee, shift, day, weight)
@@ -223,14 +242,10 @@ def solve_shift_scheduling(params, output_proto):
     #     (shift, hard_min, soft_min, min_penalty,
     #             soft_max, hard_max, max_penalty)
     shift_constraints = [
-        # One or two consecutive days of rest, this is a hard constraint.
         (0, 1, 1, 0, 2, 2, 0),
-        # between 2 and 3 consecutive days of night shifts, 1 and 4 are
-        # possible but penalized.
-        (3, 4, 4, 0, 4, 5, 0),
-
-        (1, 5, 5, 0, 6, 6, 0),
-        (2, 5, 5, 0, 6, 6, 0),
+        (1, 3, 5, 0, 6, 5, 0),
+        (2, 2, 5, 0, 6, 5, 0),
+        (3, 2, 5, 0, 6, 5, 0),
     ]
 
     # Weekly sum constraints on shifts days:
@@ -422,10 +437,10 @@ def solve_shift_scheduling(params, output_proto):
         gnt.set_xlabel('Dates')
         gnt.set_ylabel('Employees')
         # Setting ticks on y-axis
-        # gnt.set_yticks([15, 25, 35, 45])
         gnt.set_xticks(list(range(1, num_days + offset, 1)))
         gnt.set_yticks(list(range(15, (num_employees + 1) * 10 + 5, 10)))
         # Labelling tickes of y-axis
+        employees_names.reverse()
         gnt.set_yticklabels(employees_names)
         # Setting graph attribute
         gnt.grid(True)
@@ -434,7 +449,7 @@ def solve_shift_scheduling(params, output_proto):
             for d in range(num_days):
                 for s in range(num_shifts):
                     if solver.BooleanValue(work[e, s, d]):
-                        gnt.broken_barh([(d+1, d+2)], (10*(e+1), 9),
+                        gnt.broken_barh([(d+1, d+2)], (num_employees * 15 - 10*(e+2), 9),
                                         facecolors=(shifts_colors[s]))
 
         plt.savefig("gantt1.png")
